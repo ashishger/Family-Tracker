@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>হিসাব</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: #f7f4ef;
+  color: #1a1814;
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  padding-bottom: 2rem;
+}
+
+/* TOP SUMMARY BAR */
+.top-bar {
+  background: #1a1814;
+  color: #f7f4ef;
+  padding: 1.5rem 1.25rem 1.25rem;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.top-bar-title {
+  font-family: 'Tiro Bangla', serif;
+  font-size: 0.72rem;
+  color: #7a7670;
+  margin-bottom: 0.75rem;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sync-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 4px;
+}
+.sync-dot.on { background: #5ecb8a; }
+.sync-dot.off { background: #e85c5c; }
+
+.net-display {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.net-amount {
+  font-size: clamp(2rem, 9vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+.net-amount.i-get { color: #5ecb8a; }
+.net-amount.i-give { color: #e85c5c; }
+.net-amount.zero { color: #7a7670; }
+
+.net-label {
+  font-family: 'Tiro Bangla', serif;
+  font-size: 0.85rem;
+  color: #7a7670;
+  margin-bottom: 0.2rem;
+  text-align: right;
+}
+
+.two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.mini-card {
+  background: #232220;
+  border-radius: 10px;
+  padding: 0.75rem;
+}
+
+.mini-card-label {
+  font-size: 0.63rem;
+  color: #7a7670;
+  font-family: 'Tiro Bangla', serif;
+  margin-bottom: 0.3rem;
+}
+
+.mini-card-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.mini-card-val.give-val { color: #e85c5c; }
+.mini-card-val.get-val { color: #5ecb8a; }
+
+/* TABS */
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: #fff;
+  border-bottom: 1.5px solid #ede9e2;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.tab {
+  padding: 0.85rem 0.5rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: #9a9590;
+  cursor: pointer;
+  border-bottom: 2.5px solid transparent;
+  font-family: 'Tiro Bangla', serif;
+  transition: all 0.15s;
+}
+
+.tab.active {
+  color: #1a1814;
+  border-bottom-color: #1a1814;
+  font-weight: 600;
+}
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* SECTION */
+.section { padding: 1.25rem; }
+
+.section-label {
+  font-size: 0.65rem;
+  color: #9a9590;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-bottom: 1rem;
+  font-family: 'Tiro Bangla', serif;
+}
+
+/* TYPE TOGGLE */
+.type-toggle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background: #ede9e2;
+  border-radius: 10px;
+  padding: 4px;
+  margin-bottom: 1rem;
+}
+
+.type-btn {
+  padding: 0.65rem 0.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-family: 'Tiro Bangla', serif;
+  font-size: 0.8rem;
+  color: #9a9590;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: center;
+  line-height: 1.45;
+}
+
+.type-btn.active-give {
+  background: #fff;
+  color: #e85c5c;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.type-btn.active-get {
+  background: #fff;
+  color: #5ecb8a;
+  font-weight: 600;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* FORM */
+.form-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.8rem;
+}
+
+.field label {
+  display: block;
+  font-size: 0.63rem;
+  color: #9a9590;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.35rem;
+  font-family: 'Tiro Bangla', serif;
+}
+
+.field input {
+  width: 100%;
+  border: 1.5px solid #ede9e2;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.9rem;
+  color: #1a1814;
+  background: #faf9f7;
+  transition: border-color 0.15s;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: #1a1814;
+  background: #fff;
+}
+
+.add-btn {
+  width: 100%;
+  padding: 0.85rem;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.add-btn.give-btn { background: #e85c5c; color: #fff; }
+.add-btn.get-btn { background: #5ecb8a; color: #fff; }
+.add-btn:active { transform: scale(0.98); opacity: 0.9; }
+.add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* HISTORY */
+.list-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filter-chip {
+  padding: 0.38rem 0.75rem;
+  border-radius: 20px;
+  border: 1.5px solid #ede9e2;
+  background: #fff;
+  font-size: 0.7rem;
+  color: #9a9590;
+  cursor: pointer;
+  font-family: 'Tiro Bangla', serif;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.filter-chip.active {
+  background: #1a1814;
+  color: #f7f4ef;
+  border-color: #1a1814;
+}
+
+.export-chip {
+  margin-left: auto;
+  padding: 0.38rem 0.75rem;
+  border-radius: 20px;
+  border: 1.5px solid #ede9e2;
+  background: #fff;
+  font-size: 0.7rem;
+  color: #1a1814;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.export-chip:hover { background: #1a1814; color: #fff; border-color: #1a1814; }
+
+.month-select {
+  padding: 0.38rem 0.6rem;
+  border-radius: 20px;
+  border: 1.5px solid #ede9e2;
+  background: #fff;
+  font-size: 0.7rem;
+  color: #1a1814;
+  font-family: 'Tiro Bangla', serif;
+  cursor: pointer;
+}
+.month-select:focus { outline: none; }
+
+/* TX ITEMS */
+.tx-group-label {
+  font-size: 0.63rem;
+  color: #c5c0b8;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 1rem 0 0.5rem;
+  font-family: 'Outfit', sans-serif;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tx-group-net {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+.tx-group-net.give { color: #e85c5c; }
+.tx-group-net.get { color: #5ecb8a; }
+
+.tx-item {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.45rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+
+.tx-icon {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+.tx-icon.give { background: #fef2f2; }
+.tx-icon.get { background: #f0fdf6; }
+
+.tx-body { flex: 1; min-width: 0; }
+
+.tx-reason {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1a1814;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tx-date {
+  font-size: 0.65rem;
+  color: #b0aa9f;
+  margin-top: 0.15rem;
+  font-family: 'Tiro Bangla', serif;
+}
+
+.tx-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+  flex-shrink: 0;
+}
+
+.tx-amount {
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.tx-amount.give { color: #e85c5c; }
+.tx-amount.get { color: #5ecb8a; }
+
+.tx-del {
+  background: none;
+  border: none;
+  color: #d0ccc6;
+  cursor: pointer;
+  font-size: 0.72rem;
+  transition: color 0.15s;
+  padding: 0;
+}
+.tx-del:hover { color: #e85c5c; }
+
+.empty-state {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #c5c0b8;
+  font-family: 'Tiro Bangla', serif;
+  font-size: 0.9rem;
+}
+
+/* SETTINGS */
+.settings-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+
+.settings-card h3 {
+  font-size: 0.68rem;
+  color: #9a9590;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.9rem;
+  font-family: 'Tiro Bangla', serif;
+}
+
+.settings-field { margin-bottom: 0.75rem; }
+.settings-field label {
+  display: block;
+  font-size: 0.65rem;
+  color: #9a9590;
+  font-family: 'Tiro Bangla', serif;
+  margin-bottom: 0.3rem;
+}
+
+.settings-field input {
+  width: 100%;
+  border: 1.5px solid #ede9e2;
+  border-radius: 8px;
+  padding: 0.6rem 0.75rem;
+  font-family: 'Outfit', sans-serif;
+  font-size: 0.82rem;
+  color: #1a1814;
+  background: #faf9f7;
+}
+.settings-field input:focus { outline: none; border-color: #1a1814; }
+
+.settings-btn {
+  padding: 0.6rem 1.1rem;
+  border-radius: 8px;
+  border: 1.5px solid #1a1814;
+  background: #1a1814;
+  color: #f7f4ef;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 600;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+  margin-right: 0.5rem;
+  margin-top: 0.25rem;
+}
+.settings-btn:hover { opacity: 0.85; }
+
+.settings-btn.danger {
+  background: #fff;
+  color: #e85c5c;
+  border-color: #e85c5c;
+}
+
+.hint-box {
+  background: #faf9f7;
+  border: 1.5px solid #ede9e2;
+  border-radius: 10px;
+  padding: 1rem;
+  font-size: 0.75rem;
+  color: #7a7670;
+  line-height: 1.8;
+  font-family: 'Tiro Bangla', serif;
+}
+
+.hint-box ol { padding-left: 1.2rem; }
+.hint-box li { margin-bottom: 0.3rem; }
+
+.code-block {
+  background: #1a1814;
+  color: #f7f4ef;
+  border-radius: 8px;
+  padding: 0.75rem;
+  margin-top: 0.75rem;
+  font-size: 0.62rem;
+  font-family: monospace;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  overflow-x: auto;
+}
+
+.copy-btn {
+  display: block;
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #ede9e2;
+  background: #fff;
+  font-size: 0.7rem;
+  cursor: pointer;
+  font-family: 'Outfit', sans-serif;
+  color: #1a1814;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 20px;
+  font-size: 0.68rem;
+  margin-top: 0.5rem;
+  font-family: 'Tiro Bangla', serif;
+}
+.status-pill.ok { background: #f0fdf6; color: #5ecb8a; }
+.status-pill.fail { background: #fef2f2; color: #e85c5c; }
+
+/* TOAST */
+#toast {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #1a1814;
+  color: #f7f4ef;
+  padding: 0.6rem 1.2rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-family: 'Tiro Bangla', serif;
+  transition: transform 0.25s ease;
+  z-index: 999;
+  white-space: nowrap;
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+
+.divider { height: 1px; background: #ede9e2; margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- SUMMARY BAR -->
+<div class="top-bar">
+  <div class="top-bar-title">
+    <span>মোট হিসাব</span>
+    <span id="sync-status-text"><span class="sync-dot off" id="sync-dot"></span><span id="sync-text">Sheet নেই</span></span>
+  </div>
+  <div class="net-display">
+    <div class="net-amount zero" id="net-display">₹0</div>
+    <div class="net-label" id="net-label">হিসাব সমান</div>
+  </div>
+  <div class="two-cols">
+    <div class="mini-card">
+      <div class="mini-card-label">বাবাকে ফেরত দেব</div>
+      <div class="mini-card-val give-val" id="total-give">₹0</div>
+    </div>
+    <div class="mini-card">
+      <div class="mini-card-label">বাবার কাছে পাব</div>
+      <div class="mini-card-val get-val" id="total-get">₹0</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('add')">+ এন্ট্রি</div>
+  <div class="tab" onclick="switchTab('history')">ইতিহাস</div>
+  <div class="tab" onclick="switchTab('settings')">সেটিং</div>
+</div>
+
+<!-- ADD TAB -->
+<div class="tab-content active" id="tab-add">
+  <div class="section">
+    <div class="section-label">ধরন বেছে নাও</div>
+
+    <div class="type-toggle">
+      <button class="type-btn active-give" id="btn-give" onclick="setType('give')">
+        বাবার টাকা এলো<br>
+        <span style="font-size:0.63rem;opacity:0.7">ফেরত দিতে হবে</span>
+      </button>
+      <button class="type-btn" id="btn-get" onclick="setType('get')">
+        আমার খরচ<br>
+        <span style="font-size:0.63rem;opacity:0.7">বাবা দেবে</span>
+      </button>
+    </div>
+
+    <div class="form-card">
+      <div class="field-row">
+        <div class="field">
+          <label>পরিমাণ (₹)</label>
+          <input type="number" id="amount" placeholder="0" min="0" inputmode="decimal">
+        </div>
+        <div class="field">
+          <label>তারিখ</label>
+          <input type="date" id="txdate">
+        </div>
+      </div>
+      <div class="field">
+        <label>কারণ</label>
+        <input type="text" id="reason" placeholder="যেমন: electric bill, client payment...">
+      </div>
+      <button class="add-btn give-btn" id="add-btn" onclick="addEntry()">যোগ করো</button>
+    </div>
+  </div>
+</div>
+
+<!-- HISTORY TAB -->
+<div class="tab-content" id="tab-history">
+  <div class="section">
+    <div class="list-controls">
+      <button class="filter-chip active" id="f-all" onclick="setFilter('all')">সব</button>
+      <button class="filter-chip" id="f-give" onclick="setFilter('give')">ফেরত দেব</button>
+      <button class="filter-chip" id="f-get" onclick="setFilter('get')">পাব</button>
+      <select class="month-select" id="month-filter" onchange="render()">
+        <option value="all">সব মাস</option>
+      </select>
+      <button class="export-chip" onclick="exportExcel()">↓ Excel</button>
+    </div>
+    <div id="tx-list"></div>
+  </div>
+</div>
+
+<!-- SETTINGS TAB -->
+<div class="tab-content" id="tab-settings">
+  <div class="section">
+
+    <div class="settings-card">
+      <h3>Google Sheets সংযোগ</h3>
+      <div class="settings-field">
+        <label>Apps Script Web App URL</label>
+        <input type="text" id="sheet-url" placeholder="https://script.google.com/macros/s/...">
+      </div>
+      <button class="settings-btn" onclick="saveUrl()">সেভ করো</button>
+      <div id="url-status"></div>
+    </div>
+
+    <div class="settings-card">
+      <h3>Apps Script Code</h3>
+      <div class="hint-box">
+        <ol>
+          <li>Google Sheets → Extensions → Apps Script</li>
+          <li>সব delete করে নিচের code paste করো</li>
+          <li>Deploy → New deployment → Web app → Anyone → Deploy</li>
+          <li>URL টা উপরে paste করো</li>
+        </ol>
+      </div>
+      <div class="code-block" id="script-code">const SHEET_NAME = 'হিসাব';
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      sheet = ss.insertSheet(SHEET_NAME);
+      sheet.appendRow(['তারিখ','ধরন','পরিমাণ (₹)','কারণ','সময়']);
+      sheet.getRange(1,1,1,5).setFontWeight('bold');
+    }
+    sheet.appendRow([
+      data.date,
+      data.type === 'give' ? 'বাবাকে ফেরত দেব' : 'বাবার কাছে পাব',
+      data.amount,
+      data.reason,
+      new Date().toLocaleString('en-IN')
+    ]);
+    return ContentService
+      .createTextOutput(JSON.stringify({success:true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({success:false,error:err.message}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}</div>
+      <button class="copy-btn" onclick="copyCode()">📋 Code Copy করো</button>
+    </div>
+
+    <div class="settings-card">
+      <h3>ডেটা</h3>
+      <button class="settings-btn" onclick="exportExcel()">↓ Excel Download</button>
+      <button class="settings-btn danger" onclick="clearAll()">সব মুছে দাও</button>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ── STATE ──────────────────────────────────────────────
+let entries = JSON.parse(localStorage.getItem('hisab_v2') || '[]');
+let sheetUrl = localStorage.getItem('hisab_sheet') || '';
+let currentType = 'give';
+let currentFilter = 'all';
+
+const MONTHS = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+const MONTHS_SHORT = ['জানু','ফেব্রু','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টে','অক্টো','নভেম্বর','ডিসেম্বর'];
+
+// ── INIT ───────────────────────────────────────────────
+document.getElementById('txdate').value = new Date().toISOString().split('T')[0];
+document.getElementById('sheet-url').value = sheetUrl;
+updateSyncBadge();
+populateMonthFilter();
+render();
+
+// ── TABS ───────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['add','history','settings'][i] === tab);
+  });
+  document.querySelectorAll('.tab-content').forEach((t,i) => {
+    t.classList.toggle('active', ['tab-add','tab-history','tab-settings'][i] === 'tab-'+tab);
+  });
+  if (tab === 'history') render();
+}
+
+// ── TYPE ───────────────────────────────────────────────
+function setType(type) {
+  currentType = type;
+  document.getElementById('btn-give').className = 'type-btn' + (type==='give'?' active-give':'');
+  document.getElementById('btn-get').className  = 'type-btn' + (type==='get' ?' active-get' :'');
+  const btn = document.getElementById('add-btn');
+  btn.className = 'add-btn ' + (type==='give'?'give-btn':'get-btn');
+  btn.textContent = 'যোগ করো';
+}
+
+// ── FILTER ─────────────────────────────────────────────
+function setFilter(f) {
+  currentFilter = f;
+  ['all','give','get'].forEach(x => {
+    document.getElementById('f-'+x).classList.toggle('active', x===f);
+  });
+  render();
+}
+
+// ── ADD ENTRY ──────────────────────────────────────────
+async function addEntry() {
+  const amount = parseFloat(document.getElementById('amount').value);
+  const date   = document.getElementById('txdate').value;
+  const reason = document.getElementById('reason').value.trim();
+
+  if (!amount || amount <= 0) { toast('পরিমাণ দাও'); return; }
+  if (!date)   { toast('তারিখ দাও'); return; }
+  if (!reason) { toast('কারণ লেখো'); return; }
+
+  const entry = {
+    id: Date.now().toString(),
+    type: currentType,
+    amount,
+    date,
+    reason,
+    synced: false
+  };
+
+  entries.push(entry);
+  save();
+  render();
+  populateMonthFilter();
+
+  document.getElementById('amount').value = '';
+  document.getElementById('reason').value = '';
+
+  const btn = document.getElementById('add-btn');
+  btn.disabled = true;
+  btn.textContent = 'সেভ হচ্ছে...';
+
+  // Sync to sheet
+  if (sheetUrl) {
+    const ok = await sendToSheet(entry);
+    if (ok) {
+      entry.synced = true;
+      save();
+      toast('✓ যোগ হয়েছে · Sheet-এ গেছে');
+    } else {
+      toast('✓ লোকালি সেভ · Sheet sync হয়নি');
+    }
+  } else {
+    toast(currentType==='give' ? '✓ যোগ হয়েছে — ফেরত দিতে হবে' : '✓ যোগ হয়েছে — পাব');
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'যোগ করো';
+}
+
+async function sendToSheet(entry) {
+  try {
+    const r = await fetch(sheetUrl, {
+      method: 'POST',
+      body: JSON.stringify({ date: entry.date, type: entry.type, amount: entry.amount, reason: entry.reason })
+    });
+    const d = await r.json();
+    return d.success;
+  } catch { return false; }
+}
+
+// ── DELETE ─────────────────────────────────────────────
+function deleteEntry(id) {
+  if (!confirm('এই এন্ট্রি মুছে দেবে?')) return;
+  entries = entries.filter(e => e.id !== id);
+  save();
+  render();
+  populateMonthFilter();
+  toast('মুছে গেছে');
+}
+
+// ── SAVE ───────────────────────────────────────────────
+function save() {
+  localStorage.setItem('hisab_v2', JSON.stringify(entries));
+}
+
+// ── RENDER ─────────────────────────────────────────────
+function render() {
+  // Totals
+  const totalGive = entries.filter(e=>e.type==='give').reduce((s,e)=>s+e.amount,0);
+  const totalGet  = entries.filter(e=>e.type==='get') .reduce((s,e)=>s+e.amount,0);
+  const net = totalGive - totalGet;
+
+  document.getElementById('total-give').textContent = '₹'+fmt(totalGive);
+  document.getElementById('total-get') .textContent = '₹'+fmt(totalGet);
+
+  const netEl   = document.getElementById('net-display');
+  const labelEl = document.getElementById('net-label');
+
+  if (net > 0.01) {
+    netEl.textContent = '₹'+fmt(net);
+    netEl.className = 'net-amount i-give';
+    labelEl.textContent = 'আমি বাবাকে দেব';
+  } else if (net < -0.01) {
+    netEl.textContent = '₹'+fmt(Math.abs(net));
+    netEl.className = 'net-amount i-get';
+    labelEl.textContent = 'বাবা আমাকে দেবে';
+  } else {
+    netEl.textContent = '₹0';
+    netEl.className = 'net-amount zero';
+    labelEl.textContent = 'হিসাব সমান';
+  }
+
+  // List (history tab)
+  const monthSel = document.getElementById('month-filter')?.value || 'all';
+  let filtered = [...entries];
+
+  if (currentFilter !== 'all') filtered = filtered.filter(e=>e.type===currentFilter);
+  if (monthSel !== 'all') {
+    const [fy, fm] = monthSel.split('-');
+    filtered = filtered.filter(e => {
+      const d = new Date(e.date);
+      return d.getFullYear()==+fy && (d.getMonth()+1)==+fm;
+    });
+  }
+
+  filtered.sort((a,b) => new Date(b.date)-new Date(a.date));
+
+  const list = document.getElementById('tx-list');
+  if (!list) return;
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="empty-state">কোনো এন্ট্রি নেই।<br>প্রথম ট্যাব থেকে যোগ করো।</div>';
+    return;
+  }
+
+  // Group by month-year
+  const groups = {};
+  filtered.forEach(e => {
+    const d = new Date(e.date);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+    if (!groups[key]) groups[key] = { label, items: [] };
+    groups[key].items.push(e);
+  });
+
+  list.innerHTML = Object.keys(groups).sort((a,b)=>b.localeCompare(a)).map(k => {
+    const g = groups[k];
+    const gGive = g.items.filter(e=>e.type==='give').reduce((s,e)=>s+e.amount,0);
+    const gGet  = g.items.filter(e=>e.type==='get') .reduce((s,e)=>s+e.amount,0);
+    const gNet  = gGive - gGet;
+    const netLabel = gNet > 0.01
+      ? `<span class="tx-group-net give">দেব ₹${fmt(gNet)}</span>`
+      : gNet < -0.01
+        ? `<span class="tx-group-net get">পাব ₹${fmt(Math.abs(gNet))}</span>`
+        : `<span class="tx-group-net">সমান</span>`;
+
+    return `<div class="tx-group-label"><span>${g.label}</span>${netLabel}</div>` +
+      g.items.map(e => `
+        <div class="tx-item">
+          <div class="tx-icon ${e.type}">${e.type==='give'?'↑':'↓'}</div>
+          <div class="tx-body">
+            <div class="tx-reason">${esc(e.reason)}</div>
+            <div class="tx-date">${fmtDate(e.date)}${e.synced ? ' · ✓ synced' : ''}</div>
+          </div>
+          <div class="tx-right">
+            <div class="tx-amount ${e.type}">₹${fmt(e.amount)}</div>
+            <button class="tx-del" onclick="deleteEntry('${e.id}')">✕</button>
+          </div>
+        </div>`).join('');
+  }).join('');
+}
+
+// ── MONTH FILTER ───────────────────────────────────────
+function populateMonthFilter() {
+  const sel = document.getElementById('month-filter');
+  if (!sel) return;
+  const cur = sel.value;
+
+  const months = [...new Set(entries.map(e => {
+    const d = new Date(e.date);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  }))].sort((a,b)=>b.localeCompare(a));
+
+  sel.innerHTML = '<option value="all">সব মাস</option>' +
+    months.map(m => {
+      const [y, mo] = m.split('-');
+      return `<option value="${m}">${MONTHS_SHORT[+mo-1]} ${y}</option>`;
+    }).join('');
+
+  if (months.includes(cur)) sel.value = cur;
+}
+
+// ── SETTINGS ───────────────────────────────────────────
+function saveUrl() {
+  sheetUrl = document.getElementById('sheet-url').value.trim();
+  localStorage.setItem('hisab_sheet', sheetUrl);
+  updateSyncBadge();
+  const el = document.getElementById('url-status');
+  el.innerHTML = sheetUrl
+    ? '<span class="status-pill ok">✓ সেভ হয়েছে</span>'
+    : '<span class="status-pill fail">URL নেই</span>';
+  toast(sheetUrl ? 'Sheet URL সেভ হয়েছে' : 'URL মুছে গেছে');
+}
+
+function updateSyncBadge() {
+  document.getElementById('sync-dot').className = 'sync-dot ' + (sheetUrl ? 'on' : 'off');
+  document.getElementById('sync-text').textContent = sheetUrl ? 'Sheet সংযুক্ত' : 'Sheet নেই';
+}
+
+function copyCode() {
+  const code = document.getElementById('script-code').textContent;
+  navigator.clipboard.writeText(code).then(() => toast('Code copy হয়েছে'));
+}
+
+function clearAll() {
+  if (!confirm('সব এন্ট্রি মুছে দেবে? undo হবে না।')) return;
+  entries = [];
+  save();
+  render();
+  populateMonthFilter();
+  toast('সব মুছে গেছে');
+}
+
+// ── EXPORT EXCEL ───────────────────────────────────────
+function exportExcel() {
+  if (entries.length === 0) { toast('কোনো ডেটা নেই'); return; }
+
+  const totalGive = entries.filter(e=>e.type==='give').reduce((s,e)=>s+e.amount,0);
+  const totalGet  = entries.filter(e=>e.type==='get') .reduce((s,e)=>s+e.amount,0);
+  const net = totalGive - totalGet;
+
+  const rows = [...entries]
+    .sort((a,b) => new Date(b.date)-new Date(a.date))
+    .map(e => ({
+      'তারিখ': e.date,
+      'ধরন': e.type==='give' ? 'বাবাকে ফেরত দেব' : 'বাবার কাছে পাব',
+      'পরিমাণ (₹)': e.amount,
+      'কারণ': e.reason
+    }));
+
+  // Summary at bottom
+  rows.push({});
+  rows.push({ 'তারিখ': '── সারসংক্ষেপ ──' });
+  rows.push({ 'তারিখ': 'মোট বাবাকে ফেরত দেব', 'পরিমাণ (₹)': totalGive });
+  rows.push({ 'তারিখ': 'মোট বাবার কাছে পাব',   'পরিমাণ (₹)': totalGet  });
+  rows.push({ 'তারিখ': net>0 ? '► আমি বাবাকে দেব' : '► বাবা আমাকে দেবে', 'পরিমাণ (₹)': Math.abs(net) });
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [16, 24, 14, 32].map(w => ({ wch: w }));
+
+  // Bold header row
+  const range = XLSX.utils.decode_range(ws['!ref']);
+  for (let c = range.s.c; c <= range.e.c; c++) {
+    const cell = ws[XLSX.utils.encode_cell({r:0, c})];
+    if (cell) cell.s = { font: { bold: true } };
+  }
+
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'হিসাব');
+  XLSX.writeFile(wb, `হিসাব-${new Date().toISOString().split('T')[0]}.xlsx`);
+  toast('Excel ডাউনলোড হচ্ছে');
+}
+
+// ── HELPERS ────────────────────────────────────────────
+function fmt(n) {
+  return Number(n).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function fmtDate(d) {
+  const dt = new Date(d);
+  return `${dt.getDate()} ${MONTHS_SHORT[dt.getMonth()]} ${dt.getFullYear()}`;
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
