@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>পরিবার · হিসাব</title>
+<link href="https://fonts.googleapis.com/css2?family=Tiro+Bangla&family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0e0c;
+    --surface: #1a1916;
+    --surface2: #232220;
+    --border: #2e2c29;
+    --accent: #e8c547;
+    --accent2: #e87847;
+    --green: #5ecb8a;
+    --red: #e85c5c;
+    --text: #f0ece4;
+    --muted: #7a7670;
+    --baba: #e8c547;
+    --tumi: #5ecb8a;
+    --ma: #c084fc;
+    --third: #e87847;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SETUP SCREEN */
+  #setup-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    background: radial-gradient(ellipse at 30% 20%, #1e1a0e 0%, #0f0e0c 60%);
+  }
+
+  #setup-screen h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(2rem, 8vw, 4rem);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--accent);
+    margin-bottom: 0.25rem;
+  }
+
+  #setup-screen p {
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-bottom: 3rem;
+    font-family: 'Tiro Bangla', serif;
+  }
+
+  .setup-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 100%;
+    max-width: 480px;
+  }
+
+  .setup-box h2 {
+    font-family: 'Tiro Bangla', serif;
+    font-size: 1rem;
+    color: var(--muted);
+    margin-bottom: 1.5rem;
+    font-weight: 400;
+  }
+
+  .setup-field { margin-bottom: 1rem; }
+  .setup-field label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.4rem;
+  }
+
+  .setup-field input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    transition: border-color 0.2s;
+  }
+
+  .setup-field input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .setup-hint {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.3rem;
+    font-family: 'Tiro Bangla', serif;
+    line-height: 1.5;
+  }
+
+  .btn-primary {
+    width: 100%;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    padding: 0.85rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-top: 1.5rem;
+    transition: opacity 0.2s, transform 0.1s;
+    letter-spacing: 0.05em;
+  }
+
+  .btn-primary:hover { opacity: 0.9; }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .skip-link {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    color: var(--muted);
+    font-size: 0.75rem;
+    cursor: pointer;
+    text-decoration: underline;
+    font-family: 'Tiro Bangla', serif;
+  }
+
+  /* MAIN APP */
+  #app { display: none; }
+
+  header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    background: rgba(15,14,12,0.95);
+    backdrop-filter: blur(10px);
+    z-index: 100;
+  }
+
+  header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+  }
+
+  header span {
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border);
+    padding: 0 1.5rem;
+    overflow-x: auto;
+  }
+
+  .tab {
+    padding: 0.8rem 1.2rem;
+    font-size: 0.75rem;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+    font-family: 'Tiro Bangla', serif;
+    letter-spacing: 0.02em;
+  }
+
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-content { display: none; padding: 1.5rem; }
+  .tab-content.active { display: block; }
+
+  /* ADD ENTRY FORM */
+  .form-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  @media (max-width: 480px) {
+    .form-row { grid-template-columns: 1fr; }
+  }
+
+  .field { display: flex; flex-direction: column; gap: 0.4rem; }
+
+  .field label {
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .field input, .field select, .field textarea {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.7rem 0.9rem;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.85rem;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .field input:focus, .field select:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .field select option { background: var(--surface2); }
+
+  .field textarea { resize: vertical; min-height: 70px; }
+
+  /* Type pills */
+  .type-selector {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .type-pill {
+    padding: 0.6rem 0.8rem;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 0.72rem;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.15s;
+    font-family: 'Tiro Bangla', serif;
+    line-height: 1.4;
+  }
+
+  .type-pill:hover { border-color: var(--accent); color: var(--text); }
+  .type-pill.selected { border-color: var(--accent); background: rgba(232,197,71,0.1); color: var(--accent); }
+
+  .submit-btn {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 10px;
+    padding: 0.9rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.05em;
+    margin-top: 0.5rem;
+  }
+
+  .submit-btn:hover { opacity: 0.9; }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .status-msg {
+    font-size: 0.78rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    margin-top: 0.8rem;
+    font-family: 'Tiro Bangla', serif;
+    display: none;
+  }
+
+  .status-msg.success { background: rgba(94,203,138,0.1); color: var(--green); border: 1px solid rgba(94,203,138,0.3); display: block; }
+  .status-msg.error { background: rgba(232,92,92,0.1); color: var(--red); border: 1px solid rgba(232,92,92,0.3); display: block; }
+
+  /* SECTION HEADERS */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text);
+  }
+
+  /* SUMMARY CARDS */
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+  }
+
+  .summary-card.baba::before { background: var(--baba); }
+  .summary-card.tumi::before { background: var(--tumi); }
+  .summary-card.ma::before { background: var(--ma); }
+
+  .card-label {
+    font-size: 0.68rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-name {
+    font-family: 'Tiro Bangla', serif;
+    font-size: 1rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .net-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .net-amount.positive { color: var(--green); }
+  .net-amount.negative { color: var(--red); }
+  .net-amount.neutral { color: var(--muted); }
+
+  .net-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+    font-family: 'Tiro Bangla', serif;
+  }
+
+  /* SETTLEMENT BOX */
+  .settlement-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .settlement-title {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+
+  .settlement-row {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.82rem;
+  }
+
+  .settlement-row:last-child { border-bottom: none; }
+
+  .person-tag {
+    padding: 0.25rem 0.6rem;
+    border-radius: 5px;
+    font-size: 0.7rem;
+    font-weight: 500;
+  }
+
+  .person-tag.baba { background: rgba(232,197,71,0.15); color: var(--baba); }
+  .person-tag.tumi { background: rgba(94,203,138,0.15); color: var(--tumi); }
+  .person-tag.ma { background: rgba(192,132,252,0.15); color: var(--ma); }
+
+  .arrow { color: var(--muted); }
+  .settlement-amt { margin-left: auto; font-weight: 500; color: var(--accent); }
+
+  /* MONTH FILTER */
+  .filter-bar {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .filter-bar select, .filter-bar input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.5rem 0.8rem;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+  }
+
+  .filter-bar select:focus, .filter-bar input:focus { outline: none; border-color: var(--accent); }
+
+  /* TRANSACTION LIST */
+  .tx-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+  .tx-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.8rem;
+    align-items: start;
+    transition: border-color 0.15s;
+  }
+
+  .tx-item:hover { border-color: var(--border); }
+
+  .tx-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-top: 5px;
+    flex-shrink: 0;
+  }
+
+  .tx-dot.baba { background: var(--baba); }
+  .tx-dot.tumi { background: var(--tumi); }
+  .tx-dot.ma { background: var(--ma); }
+  .tx-dot.third { background: var(--third); }
+
+  .tx-info {}
+
+  .tx-title {
+    font-size: 0.82rem;
+    color: var(--text);
+    margin-bottom: 0.2rem;
+    font-family: 'Tiro Bangla', serif;
+  }
+
+  .tx-meta {
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  .tx-right { text-align: right; }
+
+  .tx-amount {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--accent);
+  }
+
+  .tx-date {
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+  }
+
+  .tx-delete {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.2rem;
+    transition: color 0.15s;
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .tx-delete:hover { color: var(--red); }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted);
+    font-family: 'Tiro Bangla', serif;
+    font-size: 0.9rem;
+  }
+
+  /* EXPORT */
+  .export-btn {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-left: auto;
+  }
+
+  .export-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* SETTINGS */
+  .settings-section { margin-bottom: 2rem; }
+  .settings-section h3 {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+  }
+
+  .settings-field { margin-bottom: 0.8rem; }
+  .settings-field label {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+    font-family: 'Tiro Bangla', serif;
+  }
+
+  .settings-field input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.6rem 0.9rem;
+    color: var(--text);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.8rem;
+  }
+
+  .settings-field input:focus { outline: none; border-color: var(--accent); }
+
+  .save-settings-btn {
+    background: var(--surface2);
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.05em;
+  }
+
+  .save-settings-btn:hover { background: rgba(232,197,71,0.1); }
+
+  .sync-status {
+    font-size: 0.72rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 6px;
+    margin-top: 0.5rem;
+    font-family: 'Tiro Bangla', serif;
+    display: none;
+  }
+
+  .sync-status.ok { background: rgba(94,203,138,0.1); color: var(--green); display: block; }
+  .sync-status.fail { background: rgba(232,92,92,0.1); color: var(--red); display: block; }
+  .sync-status.pending { background: rgba(232,197,71,0.1); color: var(--accent); display: block; }
+
+  .instructions {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.2rem;
+    font-size: 0.78rem;
+    line-height: 1.8;
+    color: var(--muted);
+    font-family: 'Tiro Bangla', serif;
+  }
+
+  .instructions ol { padding-left: 1.2rem; }
+  .instructions li { margin-bottom: 0.5rem; }
+  .instructions code {
+    background: var(--bg);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--accent);
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 1.5rem 0;
+  }
+
+  /* Offline badge */
+  .offline-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    background: rgba(232,92,92,0.15);
+    color: var(--red);
+    display: none;
+  }
+
+  .offline-badge.show { display: inline-block; }
+  .online-badge {
+    font-size: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    background: rgba(94,203,138,0.15);
+    color: var(--green);
+  }
+
+  /* Toast */
+  #toast {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.7rem 1.2rem;
+    font-size: 0.8rem;
+    font-family: 'Tiro Bangla', serif;
+    color: var(--text);
+    transition: transform 0.3s ease;
+    z-index: 999;
+    white-space: nowrap;
+  }
+
+  #toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN -->
+<div id="setup-screen">
+  <h1>পরিবার</h1>
+  <p>পারিবারিক হিসাব · Family Finance Tracker</p>
+
+  <div class="setup-box">
+    <h2>পরিবারের সদস্যদের নাম দাও</h2>
+
+    <div class="setup-field">
+      <label>বাবার নাম</label>
+      <input type="text" id="s-baba" placeholder="যেমন: বাবা" value="বাবা">
+    </div>
+    <div class="setup-field">
+      <label>তোমার নাম</label>
+      <input type="text" id="s-tumi" placeholder="যেমন: আমি / Ashish" value="আমি">
+    </div>
+    <div class="setup-field">
+      <label>মায়ের নাম</label>
+      <input type="text" id="s-ma" placeholder="যেমন: মা" value="মা">
+    </div>
+
+    <button class="btn-primary" onclick="completeSetup()">শুরু করো →</button>
+    <span class="skip-link" onclick="completeSetup()">নাম পরে বদলানো যাবে, এখন skip করো</span>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <header>
+    <h1>পরিবার · হিসাব</h1>
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <span class="online-badge" id="sync-badge">● sync</span>
+      <span class="offline-badge" id="offline-badge">● offline</span>
+    </div>
+  </header>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('add')">+ এন্ট্রি</div>
+    <div class="tab" onclick="switchTab('summary')">সারসংক্ষেপ</div>
+    <div class="tab" onclick="switchTab('history')">ইতিহাস</div>
+    <div class="tab" onclick="switchTab('settings')">সেটিং</div>
+  </div>
+
+  <!-- ADD ENTRY TAB -->
+  <div id="tab-add" class="tab-content active">
+    <div class="section-title">নতুন লেনদেন</div>
+
+    <div class="form-grid">
+      <!-- Transaction type -->
+      <div class="field">
+        <label>লেনদেনের ধরন</label>
+        <div class="type-selector" id="type-selector">
+          <div class="type-pill selected" data-type="baba-tumi" onclick="selectType(this)">বাবা → আমি<br><span style="font-size:0.65rem;opacity:0.7">বাবার টাকা আমার কাছে</span></div>
+          <div class="type-pill" data-type="third-tumi" onclick="selectType(this)">Client → আমি<br><span style="font-size:0.65rem;opacity:0.7">বাবার client আমাকে দিল</span></div>
+          <div class="type-pill" data-type="tumi-baba" onclick="selectType(this)">আমার খরচ<br><span style="font-size:0.65rem;opacity:0.7">বিল/কেনাকাটা, বাবা ফেরত দেবে</span></div>
+          <div class="type-pill" data-type="ma-baba" onclick="selectType(this)">মা ↔ বাবা<br><span style="font-size:0.65rem;opacity:0.7">মায়ের লেনদেন</span></div>
+        </div>
+      </div>
+
+      <!-- Ma-Baba direction (hidden by default) -->
+      <div class="field" id="ma-direction-field" style="display:none;">
+        <label>দিক</label>
+        <select id="ma-direction">
+          <option value="ma-baba">মা → বাবা</option>
+          <option value="baba-ma">বাবা → মা</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>পরিমাণ (টাকা ₹)</label>
+          <input type="number" id="amount" placeholder="0" min="0" step="0.01">
+        </div>
+        <div class="field">
+          <label>তারিখ</label>
+          <input type="date" id="txdate">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>কারণ / বিবরণ</label>
+        <input type="text" id="reason" placeholder="যেমন: electric bill, WiFi recharge, client payment...">
+      </div>
+
+      <div class="field">
+        <label>অতিরিক্ত নোট (ঐচ্ছিক)</label>
+        <textarea id="notes" placeholder="যেকোনো extra details..."></textarea>
+      </div>
+
+      <button class="submit-btn" id="submit-btn" onclick="submitEntry()">লেনদেন যোগ করো</button>
+      <div class="status-msg" id="status-msg"></div>
+    </div>
+  </div>
+
+  <!-- SUMMARY TAB -->
+  <div id="tab-summary" class="tab-content">
+    <div class="filter-bar">
+      <select id="summary-month" onchange="renderSummary()">
+        <option value="all">সব মাস</option>
+      </select>
+      <select id="summary-year" onchange="renderSummary()">
+        <option value="all">সব বছর</option>
+      </select>
+      <button class="export-btn" onclick="exportExcel()">↓ Excel</button>
+    </div>
+
+    <div class="section-title">নেট ব্যালেন্স</div>
+    <div class="summary-grid" id="summary-grid"></div>
+
+    <hr class="divider">
+
+    <div class="settlement-box">
+      <div class="settlement-title">মাসের শেষে কে কাকে কত দেবে</div>
+      <div id="settlement-list"></div>
+    </div>
+  </div>
+
+  <!-- HISTORY TAB -->
+  <div id="tab-history" class="tab-content">
+    <div class="filter-bar">
+      <select id="hist-month" onchange="renderHistory()">
+        <option value="all">সব মাস</option>
+      </select>
+      <select id="hist-person" onchange="renderHistory()">
+        <option value="all">সবাই</option>
+        <option value="baba">বাবা</option>
+        <option value="tumi">আমি</option>
+        <option value="ma">মা</option>
+        <option value="third">Client</option>
+      </select>
+      <button class="export-btn" onclick="exportExcel()">↓ Excel</button>
+    </div>
+    <div class="tx-list" id="tx-list"></div>
+  </div>
+
+  <!-- SETTINGS TAB -->
+  <div id="tab-settings" class="tab-content">
+    <div class="settings-section">
+      <h3>পরিবারের নাম</h3>
+      <div class="settings-field">
+        <label>বাবার নাম</label>
+        <input type="text" id="set-baba">
+      </div>
+      <div class="settings-field">
+        <label>তোমার নাম</label>
+        <input type="text" id="set-tumi">
+      </div>
+      <div class="settings-field">
+        <label>মায়ের নাম</label>
+        <input type="text" id="set-ma">
+      </div>
+      <button class="save-settings-btn" onclick="saveNames()">নাম সেভ করো</button>
+    </div>
+
+    <hr class="divider">
+
+    <div class="settings-section">
+      <h3>Google Sheets সংযোগ</h3>
+      <div class="settings-field">
+        <label>Apps Script Web App URL</label>
+        <input type="text" id="sheet-url" placeholder="https://script.google.com/macros/s/...">
+      </div>
+      <button class="save-settings-btn" onclick="saveSheetUrl()">URL সেভ করো</button>
+      <div class="sync-status" id="sync-status-msg"></div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="settings-section">
+      <h3>Google Sheets সেটআপ গাইড</h3>
+      <div class="instructions">
+        <ol>
+          <li><strong>Google Sheets খোলো</strong> — একটা নতুন spreadsheet বানাও।</li>
+          <li><strong>Extensions → Apps Script</strong> খোলো।</li>
+          <li>নিচের code টা paste করো এবং save করো।</li>
+          <li><strong>Deploy → New Deployment</strong> করো → Web App হিসেবে → "Anyone" access দাও।</li>
+          <li>দেওয়া URL টা উপরে paste করো।</li>
+        </ol>
+        <br>
+        <div style="background:var(--bg);border-radius:8px;padding:1rem;margin-top:0.5rem;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem;">
+            <span style="font-size:0.68rem;color:var(--muted);">Apps Script Code</span>
+            <button onclick="copyScript()" style="background:none;border:1px solid var(--border);color:var(--accent);border-radius:5px;padding:0.2rem 0.6rem;font-size:0.68rem;cursor:pointer;font-family:'DM Mono',monospace;">copy</button>
+          </div>
+          <pre id="script-code" style="font-size:0.65rem;color:var(--muted);white-space:pre-wrap;line-height:1.6;font-family:'DM Mono',monospace;">const SHEET_NAME = 'হিসাব';
+
+function doPost(e) {
+  try {
+    const data = JSON.parse(e.postData.contents);
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    let sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      sheet = ss.insertSheet(SHEET_NAME);
+      sheet.appendRow(['তারিখ','লেনদেনের ধরন','কে দিল','কে পেল','পরিমাণ (₹)','কারণ','নোট','সময়']);
+      sheet.getRange(1,1,1,8).setFontWeight('bold');
+    }
+    sheet.appendRow([
+      data.date, data.type, data.from, data.to,
+      data.amount, data.reason, data.notes,
+      new Date().toLocaleString('en-IN')
+    ]);
+    return ContentService.createTextOutput(JSON.stringify({success:true}))
+      .setMimeType(ContentService.MimeType.JSON);
+  } catch(err) {
+    return ContentService.createTextOutput(JSON.stringify({success:false,error:err.message}))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
+}
+
+function doGet(e) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) return ContentService.createTextOutput(JSON.stringify({data:[]})).setMimeType(ContentService.MimeType.JSON);
+  const rows = sheet.getDataRange().getValues();
+  const headers = rows[0];
+  const data = rows.slice(1).map(r => {
+    const obj = {};
+    headers.forEach((h,i) => obj[h] = r[i]);
+    return obj;
+  });
+  return ContentService.createTextOutput(JSON.stringify({data}))
+    .setMimeType(ContentService.MimeType.JSON);
+}</pre>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="settings-section">
+      <h3>ডেটা</h3>
+      <button class="save-settings-btn" onclick="exportExcel()" style="margin-right:0.5rem;">Excel Download</button>
+      <button class="save-settings-btn" onclick="clearData()" style="border-color:var(--red);color:var(--red);">সব মুছে দাও</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+// ─── STATE ───────────────────────────────────────────────────────
+let names = { baba: 'বাবা', tumi: 'আমি', ma: 'মা' };
+let transactions = [];
+let sheetUrl = '';
+let selectedType = 'baba-tumi';
+
+const MONTHS = ['জানুয়ারি','ফেব্রুয়ারি','মার্চ','এপ্রিল','মে','জুন','জুলাই','আগস্ট','সেপ্টেম্বর','অক্টোবর','নভেম্বর','ডিসেম্বর'];
+
+// ─── INIT ─────────────────────────────────────────────────────────
+function init() {
+  const saved = localStorage.getItem('poribar_names');
+  if (saved) names = JSON.parse(saved);
+
+  const savedTx = localStorage.getItem('poribar_tx');
+  if (savedTx) transactions = JSON.parse(savedTx);
+
+  sheetUrl = localStorage.getItem('poribar_sheet_url') || '';
+
+  const setupDone = localStorage.getItem('poribar_setup');
+  if (setupDone) {
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    loadApp();
+  } else {
+    document.getElementById('s-baba').value = names.baba;
+    document.getElementById('s-tumi').value = names.tumi;
+    document.getElementById('s-ma').value = names.ma;
+  }
+
+  // Set today's date
+  document.getElementById('txdate').value = new Date().toISOString().split('T')[0];
+}
+
+function completeSetup() {
+  names.baba = document.getElementById('s-baba').value.trim() || 'বাবা';
+  names.tumi = document.getElementById('s-tumi').value.trim() || 'আমি';
+  names.ma = document.getElementById('s-ma').value.trim() || 'মা';
+  localStorage.setItem('poribar_names', JSON.stringify(names));
+  localStorage.setItem('poribar_setup', '1');
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  loadApp();
+}
+
+function loadApp() {
+  populateMonthFilters();
+  renderSummary();
+  renderHistory();
+  loadSettingsFields();
+  updateSyncBadge();
+}
+
+// ─── TABS ─────────────────────────────────────────────────────────
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab')[['add','summary','history','settings'].indexOf(tab)].classList.add('active');
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (tab === 'summary') renderSummary();
+  if (tab === 'history') renderHistory();
+}
+
+// ─── TYPE SELECTOR ────────────────────────────────────────────────
+function selectType(el) {
+  document.querySelectorAll('.type-pill').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedType = el.dataset.type;
+  document.getElementById('ma-direction-field').style.display = selectedType === 'ma-baba' ? 'block' : 'none';
+}
+
+// ─── SUBMIT ───────────────────────────────────────────────────────
+async function submitEntry() {
+  const amount = parseFloat(document.getElementById('amount').value);
+  const date = document.getElementById('txdate').value;
+  const reason = document.getElementById('reason').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+
+  if (!amount || amount <= 0) { showStatus('পরিমাণ দাও', 'error'); return; }
+  if (!date) { showStatus('তারিখ দাও', 'error'); return; }
+  if (!reason) { showStatus('কারণ লেখো', 'error'); return; }
+
+  let from, to, typeLabel;
+  let txType = selectedType;
+
+  if (txType === 'ma-baba') {
+    txType = document.getElementById('ma-direction').value;
+  }
+
+  const typeMap = {
+    'baba-tumi': { from: names.baba, to: names.tumi, label: `${names.baba} → ${names.tumi}` },
+    'third-tumi': { from: 'Client', to: names.tumi, label: `Client → ${names.tumi} (${names.baba}র হয়ে)` },
+    'tumi-baba': { from: names.tumi, to: names.baba, label: `${names.tumi}র খরচ (${names.baba} ফেরত দেবে)` },
+    'ma-baba': { from: names.ma, to: names.baba, label: `${names.ma} → ${names.baba}` },
+    'baba-ma': { from: names.baba, to: names.ma, label: `${names.baba} → ${names.ma}` },
+  };
+
+  const mapped = typeMap[txType];
+  from = mapped.from;
+  to = mapped.to;
+  typeLabel = mapped.label;
+
+  const entry = {
+    id: Date.now().toString(),
+    date, type: txType, typeLabel, from, to, amount, reason, notes,
+    createdAt: new Date().toISOString()
+  };
+
+  // Save locally
+  transactions.push(entry);
+  saveTx();
+
+  // Try Google Sheets
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = 'সেভ হচ্ছে...';
+
+  let sheetOk = false;
+  if (sheetUrl) {
+    sheetOk = await sendToSheet(entry);
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'লেনদেন যোগ করো';
+
+  if (sheetUrl && sheetOk) {
+    showStatus('✓ লেনদেন সেভ হয়েছে · Google Sheet-এ গেছে', 'success');
+  } else if (sheetUrl && !sheetOk) {
+    showStatus('✓ লোকালি সেভ হয়েছে · Sheet sync হয়নি', 'success');
+  } else {
+    showStatus('✓ লেনদেন সেভ হয়েছে', 'success');
+  }
+
+  // Reset
+  document.getElementById('amount').value = '';
+  document.getElementById('reason').value = '';
+  document.getElementById('notes').value = '';
+  document.getElementById('txdate').value = new Date().toISOString().split('T')[0];
+  populateMonthFilters();
+}
+
+async function sendToSheet(entry) {
+  try {
+    const payload = {
+      date: entry.date,
+      type: entry.typeLabel,
+      from: entry.from,
+      to: entry.to,
+      amount: entry.amount,
+      reason: entry.reason,
+      notes: entry.notes
+    };
+    const resp = await fetch(sheetUrl, {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+    const data = await resp.json();
+    return data.success;
+  } catch {
+    return false;
+  }
+}
+
+function saveTx() {
+  localStorage.setItem('poribar_tx', JSON.stringify(transactions));
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('status-msg');
+  el.textContent = msg;
+  el.className = 'status-msg ' + type;
+  setTimeout(() => { el.className = 'status-msg'; }, 4000);
+}
+
+// ─── SUMMARY ──────────────────────────────────────────────────────
+function getFilteredTx(monthSel, yearSel) {
+  return transactions.filter(tx => {
+    if (monthSel === 'all' && yearSel === 'all') return true;
+    const d = new Date(tx.date);
+    const m = String(d.getMonth() + 1);
+    const y = String(d.getFullYear());
+    if (yearSel !== 'all' && y !== yearSel) return false;
+    if (monthSel !== 'all' && m !== monthSel) return false;
+    return true;
+  });
+}
+
+function renderSummary() {
+  const month = document.getElementById('summary-month').value;
+  const year = document.getElementById('summary-year').value;
+  const filtered = getFilteredTx(month, year);
+
+  // Net balance per person
+  // Positive = they are owed money, Negative = they owe
+  const bal = { baba: 0, tumi: 0, ma: 0 };
+
+  filtered.forEach(tx => {
+    const a = tx.amount;
+    switch(tx.type) {
+      case 'baba-tumi':
+        bal.baba -= a; bal.tumi += a; break;
+      case 'third-tumi':
+        // client paid tumi, tumi owes baba
+        bal.tumi -= a; bal.baba += a; break;
+      case 'tumi-baba':
+        // tumi paid, baba owes tumi
+        bal.tumi += a; bal.baba -= a; break;
+      case 'ma-baba':
+        bal.ma -= a; bal.baba += a; break;
+      case 'baba-ma':
+        bal.baba -= a; bal.ma += a; break;
+    }
+  });
+
+  const grid = document.getElementById('summary-grid');
+  grid.innerHTML = [
+    { key: 'baba', label: names.baba },
+    { key: 'tumi', label: names.tumi },
+    { key: 'ma', label: names.ma }
+  ].map(p => {
+    const b = bal[p.key];
+    const cls = b > 0 ? 'positive' : b < 0 ? 'negative' : 'neutral';
+    const lbl = b > 0 ? 'পাবে' : b < 0 ? 'দেবে' : 'সমান';
+    return `<div class="summary-card ${p.key}">
+      <div class="card-label">ব্যালেন্স</div>
+      <div class="card-name">${p.label}</div>
+      <div class="net-amount ${cls}">₹${Math.abs(b).toLocaleString('en-IN', {minimumFractionDigits:2})}</div>
+      <div class="net-label">${lbl}</div>
+    </div>`;
+  }).join('');
+
+  // Settlement
+  const settlements = [];
+  // Simple: who owes whom
+  const people = ['baba','tumi','ma'];
+  const netBal = {...bal};
+
+  // Find pairwise settlements
+  const debtors = people.filter(p => netBal[p] < 0).sort((a,b) => netBal[a]-netBal[b]);
+  const creditors = people.filter(p => netBal[p] > 0).sort((a,b) => netBal[b]-netBal[a]);
+
+  const d = debtors.map(p => ({name:p,amt: -netBal[p]}));
+  const c = creditors.map(p => ({name:p,amt: netBal[p]}));
+
+  let i=0,j=0;
+  const pays = [];
+  while(i<d.length && j<c.length) {
+    const pay = Math.min(d[i].amt, c[j].amt);
+    if (pay > 0.01) {
+      pays.push({from:d[i].name, to:c[j].name, amt:pay});
+    }
+    d[i].amt -= pay; c[j].amt -= pay;
+    if (d[i].amt < 0.01) i++;
+    if (c[j].amt < 0.01) j++;
+  }
+
+  const nameOf = k => k === 'baba' ? names.baba : k === 'tumi' ? names.tumi : names.ma;
+
+  const sl = document.getElementById('settlement-list');
+  if (pays.length === 0) {
+    sl.innerHTML = `<div style="color:var(--muted);font-size:0.82rem;font-family:'Tiro Bangla',serif;padding:0.5rem 0;">কোনো লেনদেন নেই বা হিসাব সমান।</div>`;
+  } else {
+    sl.innerHTML = pays.map(p => `
+      <div class="settlement-row">
+        <span class="person-tag ${p.from}">${nameOf(p.from)}</span>
+        <span class="arrow">→</span>
+        <span class="person-tag ${p.to}">${nameOf(p.to)}</span>
+        <span class="settlement-amt">₹${p.amt.toLocaleString('en-IN',{minimumFractionDigits:2})}</span>
+      </div>`).join('');
+  }
+}
+
+// ─── HISTORY ──────────────────────────────────────────────────────
+function renderHistory() {
+  const month = document.getElementById('hist-month').value;
+  const person = document.getElementById('hist-person').value;
+
+  let filtered = getFilteredTx(month, 'all');
+
+  if (person !== 'all') {
+    filtered = filtered.filter(tx => {
+      if (person === 'baba') return tx.type.includes('baba') || tx.type === 'tumi-baba';
+      if (person === 'tumi') return tx.type.includes('tumi');
+      if (person === 'ma') return tx.type.includes('ma');
+      if (person === 'third') return tx.type === 'third-tumi';
+      return true;
+    });
+  }
+
+  filtered = [...filtered].sort((a,b) => new Date(b.date)-new Date(a.date));
+
+  const list = document.getElementById('tx-list');
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="empty-state">কোনো লেনদেন নেই।<br>প্রথম ট্যাব থেকে যোগ করো।</div>`;
+    return;
+  }
+
+  const dotClass = tx => {
+    if (tx.type === 'third-tumi') return 'third';
+    if (tx.type.startsWith('baba')) return 'baba';
+    if (tx.type.startsWith('tumi')) return 'tumi';
+    if (tx.type.startsWith('ma')) return 'ma';
+    return 'tumi';
+  };
+
+  list.innerHTML = filtered.map(tx => `
+    <div class="tx-item" id="tx-${tx.id}">
+      <div class="tx-dot ${dotClass(tx)}"></div>
+      <div class="tx-info">
+        <div class="tx-title">${tx.reason}</div>
+        <div class="tx-meta">${tx.typeLabel}${tx.notes ? ' · ' + tx.notes : ''}</div>
+      </div>
+      <div class="tx-right">
+        <div class="tx-amount">₹${Number(tx.amount).toLocaleString('en-IN',{minimumFractionDigits:2})}</div>
+        <div class="tx-date">${formatDate(tx.date)}</div>
+        <button class="tx-delete" onclick="deleteTx('${tx.id}')" title="মুছে দাও">✕</button>
+      </div>
+    </div>`).join('');
+}
+
+function deleteTx(id) {
+  if (!confirm('এই লেনদেন মুছে দেবে?')) return;
+  transactions = transactions.filter(t => t.id !== id);
+  saveTx();
+  renderHistory();
+  renderSummary();
+  showToast('মুছে গেছে');
+}
+
+function formatDate(d) {
+  const dt = new Date(d);
+  return `${dt.getDate()} ${MONTHS[dt.getMonth()]} ${dt.getFullYear()}`;
+}
+
+// ─── MONTH FILTERS ────────────────────────────────────────────────
+function populateMonthFilters() {
+  const years = [...new Set(transactions.map(t => new Date(t.date).getFullYear()))].sort((a,b)=>b-a);
+  const curY = new Date().getFullYear();
+  if (!years.includes(curY)) years.unshift(curY);
+
+  ['summary-year','hist-month'].forEach(id => {});
+
+  const yearSelectors = ['summary-year'];
+  yearSelectors.forEach(id => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="all">সব বছর</option>' + years.map(y => `<option value="${y}">${y}</option>`).join('');
+    sel.value = cur;
+  });
+
+  const monthSelectors = ['summary-month','hist-month'];
+  monthSelectors.forEach(id => {
+    const sel = document.getElementById(id);
+    const cur = sel.value;
+    sel.innerHTML = '<option value="all">সব মাস</option>' + MONTHS.map((m,i) => `<option value="${i+1}">${m}</option>`).join('');
+    sel.value = cur;
+  });
+}
+
+// ─── EXPORT EXCEL ─────────────────────────────────────────────────
+function exportExcel() {
+  if (transactions.length === 0) { showToast('কোনো ডেটা নেই'); return; }
+
+  const rows = transactions.map(tx => ({
+    'তারিখ': tx.date,
+    'লেনদেনের ধরন': tx.typeLabel,
+    'কে দিল': tx.from,
+    'কে পেল': tx.to,
+    'পরিমাণ (₹)': tx.amount,
+    'কারণ': tx.reason,
+    'নোট': tx.notes || ''
+  }));
+
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'হিসাব');
+
+  // Column widths
+  ws['!cols'] = [12,30,12,12,14,30,20].map(w => ({wch:w}));
+
+  const fname = `পরিবার-হিসাব-${new Date().toISOString().split('T')[0]}.xlsx`;
+  XLSX.writeFile(wb, fname);
+  showToast('Excel ডাউনলোড হচ্ছে');
+}
+
+// ─── SETTINGS ─────────────────────────────────────────────────────
+function loadSettingsFields() {
+  document.getElementById('set-baba').value = names.baba;
+  document.getElementById('set-tumi').value = names.tumi;
+  document.getElementById('set-ma').value = names.ma;
+  document.getElementById('sheet-url').value = sheetUrl;
+  if (sheetUrl) {
+    document.getElementById('sync-status-msg').textContent = '✓ URL সেভ আছে';
+    document.getElementById('sync-status-msg').className = 'sync-status ok';
+  }
+}
+
+function saveNames() {
+  names.baba = document.getElementById('set-baba').value.trim() || 'বাবা';
+  names.tumi = document.getElementById('set-tumi').value.trim() || 'আমি';
+  names.ma = document.getElementById('set-ma').value.trim() || 'মা';
+  localStorage.setItem('poribar_names', JSON.stringify(names));
+  showToast('নাম সেভ হয়েছে');
+}
+
+function saveSheetUrl() {
+  sheetUrl = document.getElementById('sheet-url').value.trim();
+  localStorage.setItem('poribar_sheet_url', sheetUrl);
+  const el = document.getElementById('sync-status-msg');
+  if (sheetUrl) {
+    el.textContent = '✓ URL সেভ হয়েছে · এখন থেকে entries Sheet-এ যাবে';
+    el.className = 'sync-status ok';
+    updateSyncBadge();
+  } else {
+    el.textContent = 'URL নেই · লোকালি সেভ হবে';
+    el.className = 'sync-status fail';
+  }
+}
+
+function updateSyncBadge() {
+  document.getElementById('sync-badge').style.display = sheetUrl ? 'inline-block' : 'none';
+  document.getElementById('offline-badge').style.display = sheetUrl ? 'none' : 'inline-block';
+}
+
+function clearData() {
+  if (!confirm('সব লেনদেন মুছে দেবে? এটা undo করা যাবে না।')) return;
+  transactions = [];
+  saveTx();
+  renderHistory();
+  renderSummary();
+  showToast('সব মুছে গেছে');
+}
+
+function copyScript() {
+  const code = document.getElementById('script-code').textContent;
+  navigator.clipboard.writeText(code).then(() => showToast('Code কপি হয়েছে'));
+}
+
+// ─── TOAST ────────────────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────
+init();
+</script>
+</body>
+</html>
